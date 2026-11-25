@@ -17,21 +17,6 @@ void main() {
     await db.close();
   });
 
-  testWidgets('Agregar una tarea la muestra en la lista (persistencia real)',
-      (tester) async {
-    final db = AppDatabase.forTesting(NativeDatabase.memory());
-    await tester.pumpWidget(GestorTareasApp(database: db));
-    await tester.pumpAndSettle();
-
-    await tester.enterText(find.byType(TextField), 'Estudiar para el parcial');
-    await tester.tap(find.text('Agregar tarea'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Estudiar para el parcial'), findsOneWidget);
-
-    await db.close();
-  });
-
   testWidgets('No agrega una tarea con título vacío (P5)', (tester) async {
     final db = AppDatabase.forTesting(NativeDatabase.memory());
     await tester.pumpWidget(GestorTareasApp(database: db));

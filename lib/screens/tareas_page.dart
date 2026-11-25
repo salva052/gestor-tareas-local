@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../data/database.dart';
 
-/// ETAPA 2: alta y consulta ya usan SQLite real (vía Drift). Edición,
-/// cambio de estado y eliminación siguen pendientes (Etapa 3).
+/// Pantalla principal: alta, consulta reactiva, edición, cambio de
+/// estado y eliminación de tareas, respaldadas por SQLite vía Drift.
 class TareasPage extends StatefulWidget {
   const TareasPage({super.key, required this.database});
 
@@ -38,23 +38,55 @@ class _TareasPageState extends State<TareasPage> {
     }
   }
 
-  // Pendientes para la Etapa 3.
-  void _alternarCompletada(TareaRow tarea, bool completada) {
-    _pendiente('Implementar actualización de tarea');
+  Future<void> _alternarCompletada(TareaRow tarea, bool completada) async {
+    try {
+      await widget.database.actualizarCompletada(tarea.id, completada);
+    } catch (e) {
+      _mostrarMensaje('No se pudo actualizar el estado: $e');
+    }
   }
 
-  void _editarTarea(TareaRow tarea) {
-    _pendiente('Implementar edición de título');
-  }
-
-  void _eliminarTarea(TareaRow tarea) {
-    _pendiente('Implementar eliminación de tarea');
-  }
-
-  void _pendiente(String mensaje) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje)),
+  Future<void> _editarTarea(TareaRow tarea) async {
+    final controlador = TextEditingController(text: tarea.titulo);
+    final nuevoTitulo = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Editar tarea'),
+        content: TextField(
+          controller: controlador,
+          autofocus: true,
+          decoration: const InputDecoration(border: OutlineInputBorder()),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, controlador.text),
+            child: const Text('Guardar'),
+          ),
+        ],
+      ),
     );
+    if (nuevoTitulo == null) return;
+    if (nuevoTitulo.trim().isEmpty) {
+      _mostrarMensaje('El título no puede quedar vacío');
+      return;
+    }
+    try {
+      await widget.database.actualizarTitulo(tarea.id, nuevoTitulo);
+    } catch (e) {
+      _mostrarMensaje('No se pudo editar la tarea: $e');
+    }
+  }
+
+  Future<void> _eliminarTarea(TareaRow tarea) async {
+    try {
+      await widget.database.eliminarTarea(tarea.id);
+    } catch (e) {
+      _mostrarMensaje('No se pudo eliminar la tarea: $e');
+    }
   }
 
   void _mostrarMensaje(String mensaje) {
