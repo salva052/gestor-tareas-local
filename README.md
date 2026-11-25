@@ -1,17 +1,50 @@
-# gestor_tareas_local
+\## Etapa 4 — Web y verificación final
 
-A new Flutter project.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+\*\*Configuración web:\*\* se agregaron `sqlite3.wasm` y `drift\_worker.dart.js`
 
-A few resources to get you started if this is your first Flutter project:
+a `web/`, descargados de los releases oficiales de `drift` (simolus3/drift,
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+tag drift-2.35.4, que coincide con la versión instalada). Con esto,
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+`driftDatabase()` usa la misma base de datos SQLite tanto en nativo
+
+(sqlite3 compilado) como en el navegador (sqlite3.wasm + worker
+
+compartido), sin duplicar lógica de acceso a datos.
+
+
+
+\*\*Plataformas verificadas:\*\*
+
+\- Web (Chrome): ejecutado con `flutter run -d chrome`. Alta, edición,
+
+&#x20; cambio de estado y eliminación funcionan y los datos persisten en
+
+&#x20; SQLite real vía sqlite3.wasm.
+
+\- Windows (nativo): no se pudo compilar por falta del toolchain de
+
+&#x20; Visual Studio (Desktop development with C++), no instalable en el
+
+&#x20; tiempo disponible. El diseño sí contempla las 6 plataformas con la
+
+&#x20; misma función `driftDatabase()`.
+
+
+
+\*\*Pruebas automatizadas:\*\* `test/database\_test.dart` (capa de datos,
+
+en memoria) y `test/widget\_test.dart` (UI). Correr con `flutter test`.
+
+
+
+\*\*Fuentes consultadas:\*\*
+
+\- https://drift.simonbinder.eu/
+
+\- https://drift.simonbinder.eu/platforms/web/
+
+\- https://pub.dev/packages/drift\_flutter
+
